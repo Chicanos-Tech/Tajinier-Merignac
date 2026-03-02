@@ -1,65 +1,37 @@
-import { useState, FormEvent } from 'react';
-import { createClient } from '@supabase/supabase-js';
-
-const supabase = createClient(
-  import.meta.env.VITE_PUBLIC_SUPABASE_URL,
-  import.meta.env.VITE_PUBLIC_SUPABASE_ANON_KEY
-);
+import { useState, FormEvent } from 'react'
 
 interface EmailFormProps {
-  onSubmit: (email: string) => void;
+  onSubmit: (email: string) => void
 }
 
 export default function EmailForm({ onSubmit }: EmailFormProps) {
-  const [email, setEmail] = useState('');
-  const [error, setError] = useState('');
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [email, setEmail] = useState('')
+  const [error, setError] = useState('')
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    const trimmedEmail = email.trim();
-
+    e.preventDefault()
+    const trimmedEmail = email.trim()
+    
     if (!trimmedEmail) {
-      setError('Veuillez entrer votre email');
-      return;
+      setError('Veuillez entrer votre email')
+      return
     }
-
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
     if (!emailRegex.test(trimmedEmail)) {
-      setError('Email invalide');
-      return;
+      setError('Email invalide')
+      return
     }
-
-    setError('');
-    setIsSubmitting(true);
-
-    try {
-      // Save email to Supabase
-      const { error: supabaseError } = await supabase
-        .from('emails')
-        .insert([
-          {
-            email: trimmedEmail,
-            timestamp: new Date().toISOString(),
-            source: 'wheel_game'
-          }
-        ]);
-
-      if (supabaseError) {
-        console.error('Error saving email to Supabase:', supabaseError);
-        setError('Une erreur est survenue. Veuillez réessayer.');
-        setIsSubmitting(false);
-        return;
-      }
-
-      // Call parent callback
-      onSubmit(trimmedEmail);
-    } catch (err) {
-      console.error('Error saving email:', err);
-      setError('Une erreur est survenue. Veuillez réessayer.');
-      setIsSubmitting(false);
-    }
-  };
+    
+    setError('')
+    setIsSubmitting(true)
+    
+    // Email valide → appelle le parent (roue)
+    onSubmit(trimmedEmail)
+    
+    setIsSubmitting(false)
+  }
 
   return (
     <div className="space-y-4">
@@ -69,13 +41,8 @@ export default function EmailForm({ onSubmit }: EmailFormProps) {
           <div className="absolute inset-0 rounded-full animate-pulse bg-[#C9A227]/5" />
           <i className="ri-mail-fill text-2xl text-[#C9A227]" />
         </div>
-
-        <h2
-          className="text-lg font-bold text-[#C9A227] mb-1"
-          style={{ fontFamily: 'Playfair Display, serif' }}
-        >
-          {/* Directly use the emoji instead of a Unicode escape sequence */}
-          Marhaba ! 👋
+        <h2 className="text-lg font-bold text-[#C9A227] mb-1" style={{ fontFamily: 'Playfair Display, serif' }}>
+          Marhaba !
         </h2>
         <p className="text-[#E8DFD3]/70 text-xs">
           Entrez votre email pour participer
@@ -109,25 +76,19 @@ export default function EmailForm({ onSubmit }: EmailFormProps) {
         <button
           type="submit"
           disabled={isSubmitting}
-          className={`w-full font-semibold py-3 px-6 rounded-xl transition-all duration-300 transform shadow-lg text-xs whitespace-nowrap border border-[#C9A227]/20 relative overflow-hidden group ${
-            isSubmitting
-              ? 'bg-gray-600 cursor-not-allowed text-gray-400'
-              : 'bg-gradient-to-r from-[#8B1538] to-[#A62639] hover:from-[#7A1230] hover:to-[#952235] text-white hover:scale-[1.02] shadow-[#8B1538]/30 cursor-pointer'
-          }`}
+          className="w-full font-semibold py-3 px-6 rounded-xl transition-all duration-300 transform shadow-lg text-xs whitespace-nowrap border border-[#C9A227]/20 relative overflow-hidden group"
         >
-          <span className="relative z-10 flex items-center justify-center gap-2">
-            {isSubmitting ? (
-              <>
-                <i className="ri-loader-4-line animate-spin" />
-                Enregistrement...
-              </>
-            ) : (
-              <>
-                Continuer
-                <i className="ri-arrow-right-line group-hover:translate-x-1 transition-transform" />
-              </>
-            )}
-          </span>
+          {isSubmitting ? (
+            <>
+              <i className="ri-loader-4-line animate-spin" />
+              Enregistrement...
+            </>
+          ) : (
+            <>
+              Continuer
+              <i className="ri-arrow-right-line group-hover:translate-x-1 transition-transform" />
+            </>
+          )}
         </button>
       </form>
 
@@ -136,5 +97,5 @@ export default function EmailForm({ onSubmit }: EmailFormProps) {
         Vos données sont sécurisées
       </p>
     </div>
-  );
+  )
 }
